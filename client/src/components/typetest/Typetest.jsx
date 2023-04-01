@@ -9,11 +9,20 @@ export default function Typetest() {
     generatedWords[i] = generatedWords[i].split("")
   }
   const [words, setWords] = useState(generatedWords);
+  const [carret, setCarret] = useState(0)
 
   function wordChecker() {
     console.log("typed: ")
   }
-  
+
+  document.addEventListener('keydown', (event) => {
+    var name = event.key;
+    var code = event.code;
+    wordChecker();
+    // Alert the key name and key code on keydown
+    // alert(`Key pressed ${name} \r\n Key code value: ${code}`);
+  }, false);
+
   return (
     <div className="typetestContainer">
       <div className="typetestWrapper">
@@ -25,19 +34,17 @@ export default function Typetest() {
           <span>&nbsp;sec</span>
         </div>
         <div className="typetestText" id='wordsList'>
-          <input type="text" className="" onInput={wordChecker()}/>
-          {words.map((word) => (
+          <input type="hidden" onInput={wordChecker()}/>
+          {words.map( word => 
             <div className="word">
-              {word.map((letter) => (
+              {word.map( letter => (
                 <span>{letter}</span>
               ))}
-              <span>&nbsp;</span>
             </div>
-          ))}
+        )}
         </div>
       </div>
     </div>
   )
 }
-
 

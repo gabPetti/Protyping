@@ -8,7 +8,7 @@
   .typetestWrapper
     width: max(50vw, 350px)
     height: 230px
-    border-radius: 10px
+    border-radius: 20px
     overflow-y: hidden
     background: #181A1B
 
@@ -21,13 +21,24 @@
 
     .typetestText
       display: flex
-      padding: 20px
+      padding: 40px
       font-size: 22px
       flex-wrap: wrap
 
+      input
+
       .word
+        margin-right: 10px
         margin-bottom: 20px
 
       span
         margin-right: 1px
+
+        .active
+
+        .correct
+          color: #42484D
+
+        .incorrect
+          color: #DB6E6E
 
