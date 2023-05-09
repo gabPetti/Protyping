@@ -4,6 +4,7 @@ import "./typetest.sass";
 
 export default function Typetest() {
   var generatedWords;
+  
   const [words, setWords] = useState([]);
   const [carret, setCarret] = useState(0);
   const [activeWordIndex, setActiveWordIndex] = useState(0);
@@ -21,24 +22,36 @@ export default function Typetest() {
       for (let j = 0; j < generatedWords[i].length; j++) {
         generatedWords[i][j] = {
           text: generatedWords[i][j],
-          state: "",
+          state: " ",
         };
       }
     }
+
+    generatedWords[0][0].state = "active";
     setWords(generatedWords);
   }, []);
 
-  function handleKeyDown(event) {
+  function handleInput(event) {
+    // checkValid(event, event.data)
+    var key = event.target.value;
     // space bar
-    // checkValid(event,key)
-    if (event.key == " ") {
+    if (key == " ") {
       setActiveWordIndex(activeWordIndex + 1);
       setActiveLetterIndex(0);
-      // backspace
-    } else if (event.key == "Backspace") {
+    } else {
+      setActiveLetterIndex(activeLetterIndex + 1);
+      setActiveLetter(key);
+      wordChecker(key);
+    }
+  }
+
+  function handleKeyDown(event) {
+    if (event.keyCode === 8) {
       if (activeLetterIndex == 0) {
+        console.log("returning 1 word")
         setActiveWordIndex(activeWordIndex - 1);
-        setActiveLetterIndex(0);
+        console.log(words[activeWordIndex].map(el => el.state).lastIndexOf(""));
+        setActiveLetterIndex(words[activeWordIndex].map(el => el.state).lastIndexOf("") + 1);
       } else if (words[activeWordIndex][activeLetterIndex - 1].state == "extra") {
         setActiveLetterIndex(activeLetterIndex - 1);
         let newWords = [...words];
@@ -51,10 +64,6 @@ export default function Typetest() {
         newWords[activeWordIndex][activeLetterIndex - 1].state = "";
         setWords(newWords);
       }
-    } else {
-      setActiveLetterIndex(activeLetterIndex + 1);
-      setActiveLetter(event.key);
-      wordChecker(event.key);
     }
   }
 
@@ -104,9 +113,10 @@ export default function Typetest() {
             pattern="[A-Za-z]"
             autoFocus={true}
             onBlur={({ target }) => target.focus()}
+            onChange={handleInput}
             onKeyDown={handleKeyDown}
             value={currentInput}
-            onChange={(e) => setCurrentInput(e.target.value)}
+            // onChange={(e) => setCurrentInput(e.target.value)}
           />
           {words.map((word, i) => (
             <div key={i} className="word">
