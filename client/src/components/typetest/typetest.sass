@@ -29,7 +29,7 @@
         opacity: 0
 
     .typetestText
-      box-sizing: border-box
+      box-sizing: content-box
       display: flex
       padding: 40px
       font-size: 22px
@@ -38,17 +38,15 @@
       // .word
       //   margin-right: 10px
       //   margin-bottom: 20px
-      #carret
-        width: 2px
-        height: 25px
-        position: absolute
-
         
       span
         padding-right: 1px
         margin-bottom: 10px
         padding-bottom: 3px 
         border-bottom: 2px solid transparent
+
+        &.active
+          border-left: 2px solid white
 
         &.correct
           color: #42484D
