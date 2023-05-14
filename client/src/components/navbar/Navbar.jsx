@@ -1,10 +1,12 @@
 import "./navbar.sass";
+import TypeIt from "typeit-react";
+
 
 export default function Navbar() {
   return (
     <header className="navbarContainer">
       <div className="navbarTop">
-        <h1 className="logo">Protyping</h1>
+        <TypeIt className="logo">Protyping</TypeIt>
       </div>
       <nav className="navbarBottom">
         <ul>

@@ -21,13 +21,13 @@ export default function Typetest() {
       generatedWords = generatedWords.concat(wordGenerated)
       generatedWords.push({text: "\xa0", status: ""})
     }
+    generatedWords[0].status = "active"
     setWords([...words, ...generatedWords])
   }, []);
 
   const handleInput = event => {
     var userInput = event.target.value;
     var maxInput = userInput.length;
-    console.log(userInput)
     var copyWords = words;
     for (let i = 0; i < maxInput; i++) {
       if (userInput[i] == words[i].text) {
@@ -42,6 +42,8 @@ export default function Typetest() {
       copyWords[maxInput].status = " "
       maxInput++
     }
+
+    copyWords[userInput.length].status = "active"
     setWords([...copyWords])
   }
 
