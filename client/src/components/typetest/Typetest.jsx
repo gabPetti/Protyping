@@ -23,14 +23,17 @@ export default function Typetest() {
     }
     generatedWords[0].status = "active"
     setWords([...words, ...generatedWords])
-  }, []);
+  }, [generatedWords]);
 
+  // Compare input text with the words of the test
   const handleInput = event => {
     var userInput = event.target.value;
     var maxInput = userInput.length;
     var copyWords = words;
     for (let i = 0; i < maxInput; i++) {
       if (userInput[i] == words[i].text) {
+        copyWords[i].status = "correct"
+      } else if (userInput[i] == " " && words[i].text == "\xa0") {
         copyWords[i].status = "correct"
       } else if (userInput[i] != words[i].text) {
         copyWords[i].status = "incorrect"
@@ -67,8 +70,9 @@ export default function Typetest() {
           />
         </div>
         <div className="typetestText" id="wordsList">
+          <div id="carret"></div>
             {words.map((letter, i) => (
-              <span className={letter.status} key={i}>{letter.text}</span>
+              <span style={letter.status == "active" ? {position: "relative"} : {}} className={letter.status + " "} key={i}>{letter.text}</span>
             ))}
         </div>
       </div>

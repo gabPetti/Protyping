@@ -1,4 +1,5 @@
 import "./navbar.sass";
+import { useNavigate } from "react-router-dom";
 import TypeIt from "typeit-react";
 
 
@@ -6,7 +7,7 @@ export default function Navbar() {
   return (
     <header className="navbarContainer">
       <div className="navbarTop">
-        <TypeIt className="logo">Protyping</TypeIt>
+        <TypeIt element={"h1"} className="logo">Protyping</TypeIt>
       </div>
       <nav className="navbarBottom">
         <ul>

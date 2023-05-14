@@ -29,26 +29,31 @@
         opacity: 0
 
     .typetestText
+      box-sizing: border-box
       display: flex
       padding: 40px
       font-size: 22px
       flex-wrap: wrap
 
-
       // .word
       //   margin-right: 10px
       //   margin-bottom: 20px
+      #carret
+        width: 2px
+        height: 25px
+        position: absolute
 
+        
       span
-        margin-right: 1px
+        padding-right: 1px
         margin-bottom: 10px
-
-        &.active
-          border-left: 2px solid white
+        padding-bottom: 3px 
+        border-bottom: 2px solid transparent
 
         &.correct
           color: #42484D
 
         &.incorrect, &.extra
           color: #DB6E6E
+          border-bottom: 2px solid #DB6E6E
 
