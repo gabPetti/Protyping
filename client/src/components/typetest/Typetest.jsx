@@ -3,98 +3,46 @@ import wordList from "./words.json";
 import "./typetest.sass";
 
 export default function Typetest() {
-  var generatedWords;
-  
   const [words, setWords] = useState([]);
-  const [carret, setCarret] = useState(0);
-  const [activeWordIndex, setActiveWordIndex] = useState(0);
-  const [activeLetterIndex, setActiveLetterIndex] = useState(0);
-  const [activeLetter, setActiveLetter] = useState("");
-  const [currentInput, setCurrentInput] = useState("");
-  const [currentLetter, setCurrentLetter] = useState(0);
+  var generatedWords;
+  var wordGenerated;
 
+  // Generate words to the test
   useEffect(() => {
     generatedWords = [];
     for (let i = 0; i < 200; i++) {
-      generatedWords.push(
-        wordList.words[Math.floor(Math.random() * 9904)].split("")
-      );
-      for (let j = 0; j < generatedWords[i].length; j++) {
-        generatedWords[i][j] = {
-          text: generatedWords[i][j],
-          state: " ",
+      wordGenerated = wordList.words[Math.floor(Math.random() * 9904)].split("");
+      for (let j = 0; j < wordGenerated.length; j++) {
+        wordGenerated[j] = {
+          text: wordGenerated[j],
+          status: " "
         };
       }
+      generatedWords = generatedWords.concat(wordGenerated)
+      generatedWords.push({text: "\xa0", status: ""})
     }
-
-    generatedWords[0][0].state = "active";
-    setWords(generatedWords);
+    setWords([...words, ...generatedWords])
   }, []);
 
-  function handleInput(event) {
-    // checkValid(event, event.data)
-    var key = event.target.value;
-    // space bar
-    if (key == " ") {
-      setActiveWordIndex(activeWordIndex + 1);
-      setActiveLetterIndex(0);
-    } else {
-      setActiveLetterIndex(activeLetterIndex + 1);
-      setActiveLetter(key);
-      wordChecker(key);
-    }
-  }
-
-  function handleKeyDown(event) {
-    if (event.keyCode === 8) {
-      if (activeLetterIndex == 0) {
-        console.log("returning 1 word")
-        setActiveWordIndex(activeWordIndex - 1);
-        console.log(words[activeWordIndex].map(el => el.state).lastIndexOf(""));
-        setActiveLetterIndex(words[activeWordIndex].map(el => el.state).lastIndexOf("") + 1);
-      } else if (words[activeWordIndex][activeLetterIndex - 1].state == "extra") {
-        setActiveLetterIndex(activeLetterIndex - 1);
-        let newWords = [...words];
-        newWords[activeWordIndex].pop();
-        setWords(newWords);
-      } else {
-        setActiveLetterIndex(activeLetterIndex - 1);
-        setActiveLetter(event.key);
-        let newWords = [...words];
-        newWords[activeWordIndex][activeLetterIndex - 1].state = "";
-        setWords(newWords);
+  const handleInput = event => {
+    var userInput = event.target.value;
+    var maxInput = userInput.length;
+    console.log(userInput)
+    var copyWords = words;
+    for (let i = 0; i < maxInput; i++) {
+      if (userInput[i] == words[i].text) {
+        copyWords[i].status = "correct"
+      } else if (userInput[i] != words[i].text) {
+        copyWords[i].status = "incorrect"
       }
+      setWords([...copyWords])
     }
-  }
 
-  function wordChecker(key) {
-    if (activeLetterIndex >= words[activeWordIndex].length) {
-      let newWords = [...words];
-      newWords[activeWordIndex].push({ text: key, state: "extra" });
-      setWords(newWords);
-    } else {
-      const current = words[activeWordIndex][activeLetterIndex].text;
-      if (current == key) {
-        let newWords = [...words];
-        newWords[activeWordIndex][activeLetterIndex].state = "correct";
-        setWords(newWords);
-      } else {
-        let newWords = [...words];
-        newWords[activeWordIndex][activeLetterIndex].state = "incorrect";
-        setWords(newWords);
-      }
+    while(copyWords[maxInput].status != " ") {
+      copyWords[maxInput].status = " "
+      maxInput++
     }
-  }
-
-  function checkValid(event, key) {
-    var regex = new RegExp("^[a-zA-Z0-9]+$");
-    var key = String.fromCharCode(
-      !event.charCode ? event.which : event.charCode
-    );
-    if (!regex.test(key)) {
-      event.preventDefault();
-      return false;
-    }
+    setWords([...copyWords])
   }
 
   return (
@@ -107,26 +55,19 @@ export default function Typetest() {
           <span id="time">63</span>
           <span>&nbsp;s</span>
         </div>
-        <div className="typetestText" id="wordsList">
+        <div className="typetestInput">
           <input
             type="text"
-            pattern="[A-Za-z]"
+            // pattern="[A-Za-z]"
             autoFocus={true}
             onBlur={({ target }) => target.focus()}
             onChange={handleInput}
-            onKeyDown={handleKeyDown}
-            value={currentInput}
-            // onChange={(e) => setCurrentInput(e.target.value)}
           />
-          {words.map((word, i) => (
-            <div key={i} className="word">
-              {word.map((letter, j) => (
-                <span className={letter.state} key={j}>
-                  {letter.text}
-                </span>
-              ))}
-            </div>
-          ))}
+        </div>
+        <div className="typetestText" id="wordsList">
+            {words.map((letter, i) => (
+              <span className={letter.status} key={i}>{letter.text}</span>
+            ))}
         </div>
       </div>
     </div>
