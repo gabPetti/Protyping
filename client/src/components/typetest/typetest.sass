@@ -21,12 +21,16 @@
       
     .typetestInput
       input
-        width: 0px
+        width: 1px
         height: 0px
         position: absolute
-        top: -1
-        left: -1
-        opacity: 0
+        outline: none
+        top: 0
+        left: 0
+        z-index: -1
+        
+
+        
 
     .typetestText
       box-sizing: content-box
@@ -35,23 +39,23 @@
       font-size: 22px
       flex-wrap: wrap
 
-      // .word
-      //   margin-right: 10px
-      //   margin-bottom: 20px
+      .words
+        margin-right: 10px
+        margin-bottom: 20px
         
-      span
-        padding-right: 1px
-        margin-bottom: 10px
-        padding-bottom: 3px 
-        border-bottom: 2px solid transparent
+        span
+          padding-right: 1px
+          margin-bottom: 10px
+          padding-bottom: 3px 
+          border-bottom: 2px solid transparent
 
-        &.active
-          border-left: 2px solid white
+          &.active
+            border-left: 2px solid white
 
-        &.correct
-          color: #42484D
+          &.correct
+            color: #42484D
 
-        &.incorrect, &.extra
-          color: #DB6E6E
-          border-bottom: 2px solid #DB6E6E
+          &.incorrect, &.extra
+            color: #DB6E6E
+            border-bottom: 2px solid #DB6E6E
 
