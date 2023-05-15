@@ -40,12 +40,16 @@ export default function Typetest() {
     for (let i = 0; i < userInput.length; i++) {
       for (let j = 0; j < Math.max(userInput[i].length, initialWords[i].length); j++) {
         if (initialWords[i][j] != undefined && userInput[i][j] == undefined) {
-          copyWords[i][j].status = "";
+          if (copyWords[i][j].status == "extra") {
+            copyWords[i].pop()// = {text: "", status: ""};
+          } else {
+            copyWords[i][j].status = "";
+          }
         } else if (initialWords[i][j] == undefined && userInput[i][j] != undefined) {
-          copyWords[i][j] = { text: userInput[i][j].text, status: "extra" };
-        } else if (userInput[i][j] != initialWords[i][j].text) {
+          copyWords[i].push({ text: userInput[i][j], status: "extra" });
+        } else if (userInput[i][j] != initialWords[i][j].text && copyWords[i][j].status != "extra") {
           copyWords[i][j].status = "incorrect";
-        } else if (userInput[i][j] == initialWords[i][j].text) {
+        } else if (userInput[i][j] == initialWords[i][j].text && copyWords[i][j].status != "extra") {
           copyWords[i][j].status = "correct";
         }
       }
