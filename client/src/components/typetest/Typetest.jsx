@@ -34,7 +34,10 @@ export default function Typetest() {
     for (let i = 0; i < userInput.length; i++) {
       for (let j = 0; j < Math.max(userInput[i].length, words[i].length); j++) {
         if (userInput[i][j] == undefined && words[i][j].status == "extra") {
-          copyWords[i].pop();
+          while(j < words[i].length) {
+            copyWords[i].pop();
+
+          }
         } else if (j > userInput[i].length - 1) {
           copyWords[i][j].status = "";
         } else if (words[i][j] == undefined) {
