@@ -1,17 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import wordList from "./words.json";
 import "./typetest.sass";
 
 export default function Typetest() {
   const [words, setWords] = useState([]);
-  const [time, setTime] = useState(30);
+  const [wordsCount, setWordsCount] = useState(30);
   const [started, setStarted] = useState(false);
+  const inputElement = useRef();
 
   // Generate words to the test
   useEffect(() => {
     var generatedWords = [];
+    inputElement.current.value = "";
     var wordGenerated;
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < wordsCount; i++) {
       wordGenerated = wordList.words[Math.floor(Math.random() * 9904)].split("");
       for (let j = 0; j < wordGenerated.length; j++) {
         wordGenerated[j] = {
@@ -23,10 +25,11 @@ export default function Typetest() {
     }
     generatedWords[0][0].status = "active";
     setWords([...generatedWords])
-  }, []);
+  }, [wordsCount]);
+
   // Compare input text with the words of the test
-  const handleInput = (event) => {
-    var userInput = event.target.value;
+  const handleInput = () => {
+    var userInput = inputElement.current.value;
     userInput = userInput.split(" ");
     userInput = userInput.map((x) => x.split(""));
     var copyWords = words;
@@ -36,7 +39,6 @@ export default function Typetest() {
         if (userInput[i][j] == undefined && words[i][j].status == "extra") {
           while(j < words[i].length) {
             copyWords[i].pop();
-
           }
         } else if (j > userInput[i].length - 1) {
           copyWords[i][j].status = "";
@@ -53,25 +55,21 @@ export default function Typetest() {
     }
     setWords([...copyWords]);
   };
-  
-  // const handleTime = () => {
-  //   setStarted(true);
-  //   if (started == false) {
-  //     setTimeout(() => {
-  //       setTime((value) => value - amount)
-  //     }, 1000);
-  //   }
-  // }
 
   return (
     <div className="typetestContainer">
       <div className="typetestWrapper">
         <div className="typetestInfo">
-          <span id="wpm">74</span>
-          <span>&nbsp;WPM</span>
-          <span>&nbsp;/&nbsp;</span>
-          <span id="time">{time}</span>
-          <span>&nbsp;s</span>
+          <div className="typetestWpm">
+            <span id="wpm">0 WPM</span>
+            <span>&nbsp;•&nbsp;</span>
+            <span id="time">{setWordsCount} s</span>
+          </div>
+          <div className="typetestWordsCount">
+            <button onClick={() => setWordsCount(15)}>15</button>
+            <button onClick={() => setWordsCount(30)}>30</button>
+            <button onClick={() => setWordsCount(50)}>50</button>
+          </div>
         </div>
         <div className="typetestInput">
           <input
@@ -80,7 +78,7 @@ export default function Typetest() {
             autoFocus={true}
             onBlur={({ target }) => target.focus()}
             onChange={handleInput}
-            // onKeyDown={handleTime}
+            ref={inputElement}
           />
         </div>
         <div className="typetestText">
