@@ -1,0 +1,67 @@
+*
+  box-sizing: border-box
+  color: white
+  
+#register
+  width: 100vw
+  height: 100vh
+  display: flex
+  align-items: center
+  justify-content: center
+
+  .registerHeader
+    display: flex
+    align-items: center
+    justify-content: center
+    padding: 20px 0
+    border-bottom: 4px solid #232628
+
+    h1
+      color: white
+      font-size: 48px
+      font-weight: 500
+
+  .registerContainer
+    width: max(30vw, 300px)
+    border-radius: 20px
+    background: #181A1B
+
+    .registerForm
+      padding: 0 20px 20px 20px
+      font-size: 16px
+      input
+        box-sizing: border-box
+        display: block
+        width: 100%
+        height: 50px
+        background: #181A1B
+        border: 3px solid #42484D
+        border-radius: 15px
+        margin: 45px 0
+        font-size: 16px
+        color: white
+        padding: 0 15px
+        transition: border 0.2s
+
+      input:focus
+        border: 3px solid white
+        outline: none
+      .registerButtons
+        display: flex
+        align-items: center
+        justify-content: space-between
+
+        button
+          width: 45%
+          height: 50px
+          border-radius: 15px
+          font-size: 16px
+          cursor: pointer
+          border: 3px solid white
+          background: #181A1B
+
+        button:hover
+          background: #42484D
+
+
+
