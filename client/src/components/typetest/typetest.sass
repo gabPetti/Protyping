@@ -1,0 +1,52 @@
+.typetestContainer
+  display: flex
+  justify-content: center
+  align-items: center
+  color: white
+  margin-top: 50px
+
+  .typetestWrapper
+    width: max(50vw, 350px)
+    height: 230px
+    border-radius: 20px
+    overflow-y: hidden
+    background: #181A1B
+
+    .typetestInfo
+      display: flex
+      justify-content: flex-end
+      padding: 10px
+      font-size: 24px
+      border-bottom: 3px solid #232628
+
+    .typetestText
+      display: flex
+      padding: 40px
+      font-size: 22px
+      flex-wrap: wrap
+
+      input
+        width: 0px
+        height: 0px
+        position: absolute
+        top: -1
+        left: -1
+        opacity: 0
+
+      // .word
+      //   margin-right: 10px
+      //   margin-bottom: 20px
+
+      span
+        margin-right: 1px
+        margin-bottom: 10px
+
+        &.active
+          border-left: 2px solid white
+
+        &.correct
+          color: #42484D
+
+        &.incorrect, &.extra
+          color: #DB6E6E
+
