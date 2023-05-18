@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Casual from "./pages/casual/Casual"
+import Login from "./pages/login/Login"
+import Register from "./pages/register/Register"
 import "./App.css"
 
 function App() {
@@ -8,8 +10,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route exact path="/" element={<Casual />} />
-          {/* <Route path="/login" element={<Login />} /> */}
-          {/* <Route path="/register" element={<Register />} /> */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           {/* <Route path="/leaderboards" element={<Leaderboards />} /> */}
         </Routes>
       </BrowserRouter>
