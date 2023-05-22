@@ -6,7 +6,6 @@
   margin-top: 50px
 
   .typetestWrapper
-    position: relative
     width: max(70vw, 450px)
     border-radius: 20px
     background: #181A1B
@@ -53,14 +52,9 @@
         left: 0
         z-index: -1
     
-    #caret
-      width: 2px
-      height: 33px
-      position: absolute
-      background: white
-      transition: left 0.1s, top 0.1s
 
     .typetestText
+      position: relative
       box-sizing: content-box
       height: 126px
       display: flex
@@ -69,6 +63,13 @@
       font-size: 22px
       flex-wrap: wrap
       overflow-y: hidden
+
+      #caret
+        width: 2px
+        height: 33px
+        position: absolute
+        background: white
+        transition: left 0.1s, top 0.1s
 
       .words
         margin: 10px 0

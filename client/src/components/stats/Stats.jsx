@@ -30,7 +30,7 @@ export default function Stats(props) {
   // }, [seconds])
 
   useEffect(() => {
-    console.log(`has ${started}`);
+    // console.log(`has ${started}`);
     let intervalID;
     if (started == "Started") {
       intervalID = setInterval(

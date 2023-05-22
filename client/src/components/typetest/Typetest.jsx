@@ -5,7 +5,6 @@ import "./typetest.sass";
 const DEFAULT_WORDS = 30;
 const DEFAULT_TIME = 30;
 const DEFAULT_MODE = "TIME";
-var activeWord
 var rightChars = document.querySelectorAll('span.correct').length;
 
 $("body").keydown(function(e){
@@ -18,7 +17,7 @@ $("body").keydown(function(e){
 });
 
 export default function Typetest() {
-  const [caret, setCaret] = useState({ left: 30, top: 30, line: 1, init: false })
+  const [caret, setCaret] = useState({ left: 0, top: 6, line: 1, init: false })
   const [words, setWords] = useState([]);
   const [mode, setMode] = useState(DEFAULT_MODE);
   const [totalWords, setTotalWords] = useState(DEFAULT_WORDS);
@@ -108,22 +107,25 @@ export default function Typetest() {
     if (elem != null) {
       var line = caret.line;
       var init = caret.init;
+
       var parentTop = elem.offsetTop;
       var parentLeft = elem.offsetLeft;
+
       if (parentTop > caret.top) {
+        console.log("new line")
         const box = document.querySelector(".typetestText")
         line++;
-        if (caret.line > 2) {box.scrollBy(0, 42)}
-        var parentTop = elem.offsetTop;
-        var parentLeft = elem.offsetLeft;
+        if (line > 2) {box.scrollBy(0, 42)}
       } else if (parentTop < caret.top) {
+        console.log("remove line")
         const box = document.querySelector(".typetestText")
         line--;
-        if (caret.line > 2) {box.scrollBy(0, -42)}
-        var parentTop = elem.offsetTop;
-        var parentLeft = elem.offsetLeft;
+        if (line > 1) {box.scrollBy(0, -42)}
       }
+      var parentTop = elem.offsetTop;
+      var parentLeft = elem.offsetLeft;
       init = true
+      console.log(line)
       setCaret({ left: parentLeft, top: parentTop, line: line, init: init })
     }
   }, [words])
@@ -151,8 +153,8 @@ export default function Typetest() {
             style={{color: "black"}}
           />
         </div>
-        <div id="caret" style={{left: caret.left, top: caret.top}}></div>
         <div className="typetestText">
+          <div id="caret" style={{left: caret.left, top: caret.top}}></div>
           {words.map((word, i) => (
             <div className="words" key={i}>
               {word.map((letter, j) => (
