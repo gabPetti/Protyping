@@ -5,10 +5,13 @@ import "./typetest.sass";
 const DEFAULT_WORDS = 30;
 const DEFAULT_TIME = 30;
 const DEFAULT_MODE = "TIME";
+var activeWord
+var rightChars = document.querySelectorAll('span.correct').length;
 
 export default function Typetest() {
-  const [mode, setMode] = useState(DEFAULT_MODE)
+  const [caret, setCaret] = useState({ left: 0, top: 0, line: 1, init: false })
   const [words, setWords] = useState([]);
+  const [mode, setMode] = useState(DEFAULT_MODE);
   const [totalWords, setTotalWords] = useState(DEFAULT_WORDS);
   const [time, setTime] = useState(DEFAULT_TIME);
   const [started, setStarted] = useState(false);
@@ -29,6 +32,7 @@ export default function Typetest() {
           status: "",
         };
       }
+      wordGenerated.push({text: "\xa0"})
       wordsArray = wordsArray.concat([wordGenerated]);
     }
     wordsArray[0][0].status = "active";
@@ -39,36 +43,77 @@ export default function Typetest() {
   const handleInput = () => {
     var userInput = inputElement.current.value;
     userInput = userInput.split(" ");
-    userInput = userInput.map((x) => x.split(""));
+    //userInput = userInput.map(x => x + "\xa0");
+    userInput = userInput.map(x => x.split(""));
     var copyWords = words;
+    var inputLength;
+    var subInputLength;
+    userInput.length == undefined ? inputLength = 0 : inputLength = userInput.length;
+
     // word input checker
-    for (let i = 0; i < userInput.length; i++) {
-      for (let j = 0; j < Math.max(userInput[i].length, words[i].length); j++) {
-        if (userInput[i][j] == undefined && words[i][j].status == "extra") {
-          while (j < words[i].length) {
-            copyWords[i].pop();
-          }
+
+    for (let i = Math.max(0, inputLength - 2); i < inputLength + 1; i++) {
+      userInput[i] == undefined ? subInputLength = 0 : subInputLength = userInput[i].length;
+      words[i].pop()
+      for (let j = 0; j < Math.max(subInputLength, words[i].length); j++) {
+        // correction - next word unwriten
+        if (userInput[i] === undefined) {
+          copyWords[i][j].status = ""
+        } else if (userInput[i][j] == undefined && words[i][j].status == "extra") {
+          while (j < words[i].length) {copyWords[i].pop();}
         } else if (j > userInput[i].length - 1) {
           copyWords[i][j].status = "";
         } else if (words[i][j] == undefined) {
           copyWords[i][j] = { text: userInput[i][j], status: "extra" };
-          // right key pressed
-        } else if (
-          userInput[i][j] != words[i][j].text &&
-          copyWords[i][j].status != "extra"
-        ) {
+        } else if (userInput[i][j] === undefined) {
+          copyWords[i][j].status = "";
+        } else if (words[i][j] == "\xa0") {
+          copyWords[i][j].status = "";
+
+        // normal - wrong char
+        } else if (userInput[i][j] != words[i][j].text && copyWords[i][j].status != "extra") {
           copyWords[i][j].status = "incorrect";
-          // right key pressed
-        } else if (
-          userInput[i][j] == words[i][j].text &&
-          copyWords[i][j].status != "extra"
-        ) {
+
+        // normal - right char
+        } else if (userInput[i][j] == words[i][j].text && copyWords[i][j].status != "extra") {
           copyWords[i][j].status = "correct";
         }
       }
+      words[i].push({text: "\xa0"})
     }
+
+    if (copyWords[userInput.length - 1][userInput[userInput.length - 1].length] == undefined) {
+      copyWords[userInput.length][0].status = "active";
+    } else {
+      copyWords[userInput.length - 1][userInput[userInput.length - 1].length].status = "active";
+    }
+
+    
+    
     setWords([...copyWords]);
   };
+  
+  // caret smooth effect
+  useEffect(() => {
+    console.log(caret)
+    const elem = document.querySelector("span.active");
+    if (elem != null) {
+      var line = caret.line;
+      var init = caret.init;
+      const rect = elem.getBoundingClientRect();
+      if (rect.top > caret.top) {
+        const box = document.querySelector(".typetestText")
+        line++;
+        if (caret.line > 2) {box.scrollBy(0, 42)}
+      } else if (rect.top < caret.top) {
+        const box = document.querySelector(".typetestText")
+        line--;
+        if (caret.line > 2) {box.scrollBy(0, 42)}
+      }
+      init = true
+      setCaret({ left: rect.left, top: rect.top, line: line, init: init })
+    }
+  }, [words])
 
   return (
     <div className="typetestContainer">
@@ -90,8 +135,10 @@ export default function Typetest() {
             autoFocus
             onChange={handleInput}
             ref={inputElement}
+            style={{color: "black"}}
           />
         </div>
+        <div id="caret" style={{left: caret.left, top: caret.top}}></div>
         <div className="typetestText">
           {words.map((word, i) => (
             <div className="words" key={i}>

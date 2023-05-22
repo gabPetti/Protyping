@@ -68,9 +68,8 @@ export default function Stats(props) {
 
   return (
     <>
-      <span id="wpm">0 WPM</span>
-      <span>&nbsp;•&nbsp;</span>
-      {props.mode === "TIME" ? <span id="seconds">{props.time} s</span> : <span id="words">0/{props.totalWords}</span>}
+      <span id="wpm">0 WPM • {props.mode === "TIME" ? props.time + "s": "0/" + props.words}</span>
+      
     </>
   );
 }
