@@ -6,7 +6,7 @@
   margin-top: 50px
 
   .typetestWrapper
-    width: max(50vw, 350px)
+    width: max(70vw, 450px)
     border-radius: 20px
     background: #181A1B
 
@@ -18,7 +18,7 @@
       font-size: 24px
       border-bottom: 3px solid #232628
 
-    .typetestWordsCount
+    .typetestConfig
       button
         border: 3px solid white
         width: 50px
@@ -44,33 +44,39 @@
       
     .typetestInput
       input
-        width: 1px
-        height: 0px
+        width: 10px
+        height: 1px
         position: absolute
         outline: none
         top: 0
         left: 0
-        z-index: -1        
+        z-index: -1
+    
+    #caret
+      width: 2px
+      height: 33px
+      position: absolute
+      background: white
+      transition: left 0.1s, top 0.1s
 
     .typetestText
-      box-sizing: border-box
+      box-sizing: content-box
+      height: 126px
       display: flex
-      padding: 30px
+      border: 30px solid #181A1B
+      border-radius: 0 0 20px 20px
       font-size: 22px
       flex-wrap: wrap
+      overflow-y: hidden
 
       .words
         margin: 10px 0
-        margin-right: 14px
         
         span
           padding-right: 1px
           margin-bottom: 10px
           padding-bottom: 3px 
           border-bottom: 2px solid transparent
-
-          &.active
-            border-left: 2px solid white
 
           &.correct
             color: #42484D
