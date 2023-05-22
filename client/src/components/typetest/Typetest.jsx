@@ -112,12 +112,10 @@ export default function Typetest() {
       var parentLeft = elem.offsetLeft;
 
       if (parentTop > caret.top) {
-        console.log("new line")
         const box = document.querySelector(".typetestText")
         line++;
         if (line > 2) {box.scrollBy(0, 42)}
       } else if (parentTop < caret.top) {
-        console.log("remove line")
         const box = document.querySelector(".typetestText")
         line--;
         if (line > 1) {box.scrollBy(0, -42)}
@@ -125,7 +123,6 @@ export default function Typetest() {
       var parentTop = elem.offsetTop;
       var parentLeft = elem.offsetLeft;
       init = true
-      console.log(line)
       setCaret({ left: parentLeft, top: parentTop, line: line, init: init })
     }
   }, [words])
