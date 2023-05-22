@@ -18,7 +18,7 @@ $("body").keydown(function(e){
 });
 
 export default function Typetest() {
-  const [caret, setCaret] = useState({ left: 0, top: 0, line: 1, init: false })
+  const [caret, setCaret] = useState({ left: 30, top: 30, line: 1, init: false })
   const [words, setWords] = useState([]);
   const [mode, setMode] = useState(DEFAULT_MODE);
   const [totalWords, setTotalWords] = useState(DEFAULT_WORDS);
@@ -104,25 +104,27 @@ export default function Typetest() {
   
   // caret smooth effect
   useEffect(() => {
-    console.log(caret)
     const elem = document.querySelector("span.active");
     if (elem != null) {
       var line = caret.line;
       var init = caret.init;
-      var rect = elem.getBoundingClientRect();
-      if (rect.top > caret.top) {
+      var parentTop = elem.offsetTop;
+      var parentLeft = elem.offsetLeft;
+      if (parentTop > caret.top) {
         const box = document.querySelector(".typetestText")
         line++;
         if (caret.line > 2) {box.scrollBy(0, 42)}
-        var rect = elem.getBoundingClientRect();
-      } else if (rect.top < caret.top) {
+        var parentTop = elem.offsetTop;
+        var parentLeft = elem.offsetLeft;
+      } else if (parentTop < caret.top) {
         const box = document.querySelector(".typetestText")
         line--;
         if (caret.line > 2) {box.scrollBy(0, -42)}
-        rect = elem.getBoundingClientRect();
+        var parentTop = elem.offsetTop;
+        var parentLeft = elem.offsetLeft;
       }
       init = true
-      setCaret({ left: rect.left, top: rect.top, line: line, init: init })
+      setCaret({ left: parentLeft, top: parentTop, line: line, init: init })
     }
   }, [words])
 
