@@ -8,6 +8,15 @@ const DEFAULT_MODE = "TIME";
 var activeWord
 var rightChars = document.querySelectorAll('span.correct').length;
 
+$("body").keydown(function(e){
+  var zKey = 90;
+  var vKey = 86;
+  if ((e.ctrlKey || e.metaKey) && e.keyCode == zKey || (e.ctrlKey || e.metaKey) && e.keyCode == vKey) {
+    e.preventDefault();
+    return false;
+  }
+});
+
 export default function Typetest() {
   const [caret, setCaret] = useState({ left: 0, top: 0, line: 1, init: false })
   const [words, setWords] = useState([]);
@@ -52,7 +61,7 @@ export default function Typetest() {
 
     // word input checker
 
-    for (let i = Math.max(0, inputLength - 2); i < inputLength + 1; i++) {
+    for (let i = Math.max(0, inputLength - 2); i < Math.min(totalWords, inputLength + 1); i++) {
       userInput[i] == undefined ? subInputLength = 0 : subInputLength = userInput[i].length;
       words[i].pop()
       for (let j = 0; j < Math.max(subInputLength, words[i].length); j++) {
@@ -100,15 +109,17 @@ export default function Typetest() {
     if (elem != null) {
       var line = caret.line;
       var init = caret.init;
-      const rect = elem.getBoundingClientRect();
+      var rect = elem.getBoundingClientRect();
       if (rect.top > caret.top) {
         const box = document.querySelector(".typetestText")
         line++;
         if (caret.line > 2) {box.scrollBy(0, 42)}
+        var rect = elem.getBoundingClientRect();
       } else if (rect.top < caret.top) {
         const box = document.querySelector(".typetestText")
         line--;
-        if (caret.line > 2) {box.scrollBy(0, 42)}
+        if (caret.line > 2) {box.scrollBy(0, -42)}
+        rect = elem.getBoundingClientRect();
       }
       init = true
       setCaret({ left: rect.left, top: rect.top, line: line, init: init })
