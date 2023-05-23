@@ -5,6 +5,7 @@ import "./typetest.sass";
 const DEFAULT_WORDS = 30;
 const DEFAULT_TIME = 30;
 const DEFAULT_MODE = "TIME";
+var clicked = false;
 
 export default function Typetest({ onQuery }) {
   const [caret, setCaret] = useState({ left: 0, top: 6, line: 1, init: false });
@@ -32,31 +33,10 @@ export default function Typetest({ onQuery }) {
     }
   }, [end]);
 
-  $("body").keydown((e) => {
-    if (e.repeat) {
-      return;
+  $("body").off().on("click", function() {
+    if (!$("input:not(#inputElement)").is(":focus")) {
+      inputElement.current.focus();
     }
-    var tabKey = 9;
-    var zKey = 90;
-    var vKey = 86;
-    if (e.keyCode == tabKey) {
-      console.log("refresh");
-      e.preventDefault();
-      setRefresh((x) => x + 1);
-    }
-    if (
-      ((e.ctrlKey || e.metaKey) && e.keyCode == zKey) ||
-      ((e.ctrlKey || e.metaKey) && e.keyCode == vKey)
-    ) {
-      console.log("you cannot use this shortcut");
-      e.preventDefault();
-      return false;
-    }
-  });
-
-  $("input:not(#inputElement)").on("blur", function() {
-    console.log("back to test")
-    inputElement.current.focus();
   })
 
   // Generate words to the test
