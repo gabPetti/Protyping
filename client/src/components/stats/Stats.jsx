@@ -2,74 +2,58 @@ import { useState, useEffect, useRef } from "react";
 import "./stats.sass";
 const DEFAULT_WORDS = 30;
 const DEFAULT_TIME = 30;
+const DEFAULT_MODE = "TIME";
 
-export default function Stats(props) {
-  const [started, setStarted] = useState(false);
-  const inputSeconds = useRef(DEFAULT_TIME);
+export default function Stats({ onEnd, started }) {
+  const [mode, setMode] = useState(DEFAULT_MODE);
+  const [totalWords, setTotalWords] = useState(DEFAULT_WORDS);
+  const [time, setTime] = useState(DEFAULT_TIME);
 
-  const decreaseSeconds = () => {
-    setSeconds((prevSeconds) => {
-      if (prevSeconds > 0) {
-        return --prevSeconds;
-      } else {
-        endTest();
-        return inputSeconds;
-      }
-    });
-  };
+  // timer end handler
+  function handleEnd() {
+    onEnd(true);
+  }
 
-  const increaseSeconds = () => {
-    setSeconds((prevSeconds) => {
-      return ++prevSeconds;
-    });
-  };
-
-  //uncomment to check if interval is running even after ending
-  // useEffect(() => {
-  //   console.log('test')
-  // }, [seconds])
-
+  // timer that counts down until 0
   useEffect(() => {
-    // console.log(`has ${started}`);
-    let intervalID;
-    if (started == "Started") {
-      intervalID = setInterval(
-        inputSeconds.current == 0 ? increaseSeconds : decreaseSeconds,
-        1000
-      );
+    if (started === true && mode === "TIME") {
+      const timer = time > 0 && setInterval(() => setTime(time - 1), 1000);
+      return () => {
+        time == 1 && handleEnd();
+        clearInterval(timer);
+      };
     }
-    return () => clearInterval(intervalID);
-  }, [started]);
+  }, [time, started]);
 
-  //bug? if you click start multiple times around the time it reaches 0, the program crashes
-  const startTest = () => {
-    if (started == "Paused") {
-      setSeconds(seconds);
-      //setStatus('Started')
-    } else if (started == "Ended") {
-      setSeconds(inputSeconds.current);
-      //setStatus('Started')
-    }
-    setStatus("Started");
-  };
-
-  const endTest = () => {
-    if (started == "Started") {
-      setSeconds(0);
-      setStatus("Ended");
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key == "Enter") {
-      inputSeconds.current = e.target.value;
+  const handleConfig = (e) => {
+    started = false;
+    console.log(started)
+    if (e === "mode" && mode === "TIME") {
+      setMode("WORDS");
+    } else if (e === "mode" && mode === "WORDS") {
+      setMode("TIME");
+    } else if (mode === "TIME") {
+      setTime(e);
+    } else if (mode === "WORDS") {
+      setTotalWords(e);
     }
   };
 
   return (
     <>
-      <span id="wpm">0 WPM • {props.mode === "TIME" ? props.time + "s": "0/" + props.words}</span>
-      
+      <div className="statsWrapper">
+        <div className="stats">
+          <span id="wpm">
+            {} WPM • {mode === "TIME" ? time + "s" : "0/" + totalWords}
+          </span>
+        </div>
+        <div className="statsConfig">
+          <button onClick={() => handleConfig(15)}>15</button>
+          <button onClick={() => handleConfig(30)}>30</button>
+          <button onClick={() => handleConfig(60)}>60</button>
+          <button onClick={() => handleConfig("mode")}>{mode}</button>
+        </div>
+      </div>
     </>
   );
 }
