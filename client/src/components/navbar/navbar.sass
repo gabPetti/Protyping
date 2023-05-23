@@ -27,3 +27,32 @@
 
         a:hover
           border-bottom: 2px solid white 
+
+  .user.protyper
+    background: linear-gradient(90deg, #fdf8b0, #e0aa3e, #fdf8b0, #e0aa3e)
+
+  .user.diamond
+    background: linear-gradient(90deg, #D4EFF2, #70D1F4, #D4EFF2, #70D1F4)
+  
+  .user.platinum
+    background: linear-gradient(90deg, #ffffff, #bec1bd, #ffffff, #bec1bd)
+
+  .user.bronze
+    background: linear-gradient(90deg, #F0B877, #B3592F, #F0B877, #B3592F)
+
+
+  span.user
+    margin: 0 100px
+    background-size: 300% 300%
+    animation: gradient 2s linear infinite
+    height: 100vh
+    background-clip: text
+    -webkit-background-clip: text
+    color: transparent
+
+@keyframes gradient
+  0%
+    background-position: left
+
+  100%
+    background-position: right
