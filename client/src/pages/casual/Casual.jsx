@@ -6,7 +6,6 @@ export default function Casual() {
   return (
     <>
       <Navbar />
-      <input type="text" />
       <TestArea />
     </>
   );

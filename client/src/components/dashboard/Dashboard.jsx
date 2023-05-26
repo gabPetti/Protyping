@@ -115,29 +115,29 @@ const optionsLine = {
   }
 }
 
-export default function Dashboard() {
+export default function Dashboard({ wpm, accuracy, raw, consistency, burst }) {
   return (
     <div className="dashboardContainer">
       <div className="dashboardWrapper">
         <div className="dashboardTop">
           <div className='stats'>
-            <h2>64</h2>
+            <h2>{Math.round(wpm)}</h2>
             <h3>WPM</h3>
           </div>
           <div className='stats'>
-            <h2>95%</h2>
+            <h2>{Math.round(accuracy)}%</h2>
             <h3>Accuracy</h3>
           </div>
           <div className='stats'>
-            <h2>64</h2>
+            <h2>{raw}</h2>
             <h3>Raw</h3>
           </div>
           <div className='stats'>
-            <h2>61%</h2>
-            <h3>Consistecy</h3>
+            <h2>{Math.round(consistency)}%</h2>
+            <h3>Consistency</h3>
           </div>
           <div className='stats'>
-            <h2>70</h2>
+            <h2>{burst}</h2>
             <h3>Burst</h3>
           </div>
         </div>

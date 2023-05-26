@@ -2,50 +2,67 @@ import { useState, useEffect, useRef } from "react";
 import wordList from "./words.json";
 import Stats from "../stats/Stats";
 import "./typetest.sass";
-const DEFAULT_WORDS = 30;
-const DEFAULT_TIME = 30;
-const DEFAULT_MODE = "TIME";
-var clicked = false;
+var errorChars = 0;
+var oldInputElement = 0;
 
 export default function Typetest({ onQuery }) {
   const [caret, setCaret] = useState({ left: 0, top: 6, line: 1, init: false });
   const [words, setWords] = useState([]);
-  const [totalWords, setTotalWords] = useState(60);
-  const [refresh, setRefresh] = useState(0);
+  const [typedChars, setTypedChars] = useState("12");
+  const [time, setTime] = useState();
+  
+  const [mode, setMode] = useState("TIME");
+  const [totalWords, setTotalWords] = useState(30);
+  const [totalTime, setTotalTime] = useState(30);
+  
+  const [wpm, setWpm] = useState(0)
   const [started, setStarted] = useState(false);
-  const inputElement = useRef();
   const [end, setEnd] = useState(false);
-  // var stats = { wpm, accuracy, consistency, rightChars, wrongChars };
+  const inputElement = useRef();
+  
+  // automatic focus on test when not fosusing on another input
+  $("body").off().on("click", function () {
+      if (!$("input:not(#inputElement)").is(":focus")) {
+        inputElement.current.focus();
+      }
+  });
+
+  // handle when shortcuts are pressed
+  function handleKeyDown(e) {
+    var zKey = 90;
+    var vKey = 86;
+    if ((e.ctrlKey || e.metaKey) && e.keyCode == zKey || (e.ctrlKey || e.metaKey) && e.keyCode == vKey) {
+      e.preventDefault();
+      return false;
+    }
+  }
 
   // transition to dashboard
   useEffect(() => {
     if (end === true) {
       onQuery({
-        wpm: 0,
-        accuracy: 0,
-        consistency: 0,
-        rightChars: document.querySelectorAll("span.correct").length,
-        wrongChars:
-          document.querySelectorAll("span.incorrect").length +
-          document.querySelectorAll("span.extra").length,
-        finished: true,
+        wpm: wpm,                                                    // kinda working
+        accuracy: (typedChars - errorChars) * 100 / typedChars,      // kinda working
+        raw: 0,                                                      // not working
+        consistency: 0,                                              // not working
+        burst: 0,                                                    // not working
+        finished: true,                                              // working
       });
     }
   }, [end]);
 
-  $("body").off().on("click", function() {
-    if (!$("input:not(#inputElement)").is(":focus")) {
-      inputElement.current.focus();
-    }
-  })
-
-  // Generate words to the test
+  // Reset test
   useEffect(() => {
+    // reset variables
+    setTypedChars(0);
+    errorChars = 0;
+    oldInputElement = 0;
+
     var wordsArray = [];
     inputElement.current.value = "";
     var wordGenerated;
-
-    for (let i = 0; i < totalWords; i++) {
+    var wordsNum = mode === "TIME" ? 200 : totalWords;
+    for (let i = 0; i < wordsNum; i++) {
       wordGenerated =
         wordList.words[Math.floor(Math.random() * 9904)].split("");
       for (let j = 0; j < wordGenerated.length; j++) {
@@ -59,11 +76,16 @@ export default function Typetest({ onQuery }) {
     }
     wordsArray[0][0].status = "active";
     setWords([...wordsArray]);
-  }, [totalWords, refresh]);
+    setStarted(false)
+  }, [mode, totalWords, totalTime]);
 
   // Compare input text with the words of the test
   const handleInput = () => {
     setStarted(true);
+    if (oldInputElement < inputElement.current.value.length) {
+      setTypedChars(x => x + 1);
+    }
+    oldInputElement = inputElement.current.value.length;
     var userInput = inputElement.current.value;
     userInput = userInput.split(" ");
     userInput = userInput.map((x) => x.split(""));
@@ -91,10 +113,17 @@ export default function Typetest({ onQuery }) {
           }
         } else if (j > userInput[i].length - 1) {
           copyWords[i][j].status = "";
+
+          // extra char
         } else if (words[i][j] == undefined) {
           copyWords[i][j] = { text: userInput[i][j], status: "extra" };
+          errorChars++;
+
+          // not typed/backspaced char
         } else if (userInput[i][j] === undefined) {
           copyWords[i][j].status = "";
+
+          // space
         } else if (words[i][j] == "\xa0") {
           copyWords[i][j].status = "";
 
@@ -103,6 +132,9 @@ export default function Typetest({ onQuery }) {
           userInput[i][j] != words[i][j].text &&
           copyWords[i][j].status != "extra"
         ) {
+          if (words[i][j].status != "incorrect") {
+            errorChars++;
+          }
           copyWords[i][j].status = "incorrect";
 
           // normal - right char
@@ -117,10 +149,7 @@ export default function Typetest({ onQuery }) {
     }
 
     // locate active word
-    if (
-      copyWords[userInput.length - 1][userInput[userInput.length - 1].length] ==
-      undefined
-    ) {
+    if (copyWords[userInput.length - 1][userInput[userInput.length - 1].length] == undefined) {
       copyWords[userInput.length][0].status = "active";
     } else {
       copyWords[userInput.length - 1][
@@ -164,7 +193,16 @@ export default function Typetest({ onQuery }) {
   return (
     <div className="typetestContainer">
       <div className="typetestWrapper">
-        <Stats started={started} onEnd={setEnd} />
+        <Stats
+          started={started}
+          typedChars={typedChars}
+          onEnd={setEnd}
+          getTime={setTime}
+          getWpm={setWpm}
+          getTotalWords={setTotalTime}
+          getTotalTime={setTotalWords}
+          getMode={setMode}
+        />
         <div className="typetestInput">
           <input
             id="inputElement"
@@ -172,6 +210,7 @@ export default function Typetest({ onQuery }) {
             autoFocus
             onChange={handleInput}
             ref={inputElement}
+            onKeyDown={() => handleKeyDown(event)}
           />
         </div>
         <div className="typetestText">
