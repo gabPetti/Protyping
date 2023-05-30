@@ -24,21 +24,7 @@ ChartJS.register(
   CategoryScale,
   LinearScale,
   Title,
-  );
-  
-  const dataRadar = {
-    labels: ['WPM', 'Accuracy', 'Raw', 'Consistency', 'Burst'],
-    datasets: [
-      {
-      label: false,
-      data: [64, 95, 64, 61, 2],
-      backgroundColor: 'rgba(255, 99, 132, 0.2)',
-      borderColor: 'rgba(255, 99, 132, 1)',
-      borderWidth: 2,
-      color: "white",
-    },
-  ],
-};
+);
 
 export const dataLine = {
   labels: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],
@@ -116,6 +102,21 @@ const optionsLine = {
 }
 
 export default function Dashboard({ wpm, accuracy, raw, consistency, burst }) {
+
+  const dataRadar = {
+    labels: ['WPM', 'Accuracy', 'Raw', 'Consistency', 'Burst'],
+    datasets: [
+      {
+        label: false,
+        data: [wpm, accuracy, raw, 61, 2],
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        borderWidth: 2,
+        color: "white",
+      },
+    ],
+  };
+
   return (
     <div className="dashboardContainer">
       <div className="dashboardWrapper">

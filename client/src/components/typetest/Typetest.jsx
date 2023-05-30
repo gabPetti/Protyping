@@ -8,14 +8,16 @@ var oldInputElement = 0;
 export default function Typetest({ onQuery }) {
   const [caret, setCaret] = useState({ left: 0, top: 6, line: 1, init: false });
   const [words, setWords] = useState([]);
-  const [typedChars, setTypedChars] = useState("12");
+  const [typedChars, setTypedChars] = useState(0);
+  const [correctChars, setCorrectChars] = useState(0);
   const [time, setTime] = useState();
   
   const [mode, setMode] = useState("TIME");
-  const [totalWords, setTotalWords] = useState(30);
+  const [totalWords, setTotalWords] = useState(100);
   const [totalTime, setTotalTime] = useState(30);
   
-  const [wpm, setWpm] = useState(0)
+  const [wpm, setWpm] = useState(0);
+  const [raw, setRaw] = useState(0);
   const [started, setStarted] = useState(false);
   const [end, setEnd] = useState(false);
   const inputElement = useRef();
@@ -31,7 +33,10 @@ export default function Typetest({ onQuery }) {
   function handleKeyDown(e) {
     var zKey = 90;
     var vKey = 86;
-    if ((e.ctrlKey || e.metaKey) && e.keyCode == zKey || (e.ctrlKey || e.metaKey) && e.keyCode == vKey) {
+    var aKey = 65;
+    if ((e.ctrlKey || e.metaKey) && e.keyCode == zKey ||
+      (e.ctrlKey || e.metaKey) && e.keyCode == vKey || 
+      (e.ctrlKey || e.metaKey) && e.keyCode == aKey) {
       e.preventDefault();
       return false;
     }
@@ -42,8 +47,8 @@ export default function Typetest({ onQuery }) {
     if (end === true) {
       onQuery({
         wpm: wpm,                                                    // kinda working
-        accuracy: (typedChars - errorChars) * 100 / typedChars,      // kinda working
-        raw: 0,                                                      // not working
+        accuracy: (typedChars - errorChars) * 100 / typedChars,      // kinda working, needs to add error from incorrect spacing
+        raw: typedChars,                                             // kinda working
         consistency: 0,                                              // not working
         burst: 0,                                                    // not working
         finished: true,                                              // working
@@ -55,16 +60,15 @@ export default function Typetest({ onQuery }) {
   useEffect(() => {
     // reset variables
     setTypedChars(0);
+    setCorrectChars(0);
     errorChars = 0;
     oldInputElement = 0;
 
     var wordsArray = [];
     inputElement.current.value = "";
     var wordGenerated;
-    var wordsNum = mode === "TIME" ? 200 : totalWords;
-    for (let i = 0; i < wordsNum; i++) {
-      wordGenerated =
-        wordList.words[Math.floor(Math.random() * 9904)].split("");
+    for (let i = 0; i < totalWords; i++) {
+      wordGenerated = wordList.words[Math.floor(Math.random() * 9904)].split("");
       for (let j = 0; j < wordGenerated.length; j++) {
         wordGenerated[j] = {
           text: wordGenerated[j],
@@ -72,9 +76,10 @@ export default function Typetest({ onQuery }) {
         };
       }
       wordGenerated.push({ text: "\xa0" });
-      wordsArray = wordsArray.concat([wordGenerated]);
+      wordsArray = wordsArray.concat({ textArray: wordGenerated, status: "" });
     }
-    wordsArray[0][0].status = "active";
+    wordsArray[0].textArray[0].status = "active";
+    wordsArray[0].status = "active";
     setWords([...wordsArray]);
     setStarted(false)
   }, [mode, totalWords, totalTime]);
@@ -86,6 +91,7 @@ export default function Typetest({ onQuery }) {
       setTypedChars(x => x + 1);
     }
     oldInputElement = inputElement.current.value.length;
+
     var userInput = inputElement.current.value;
     userInput = userInput.split(" ");
     userInput = userInput.map((x) => x.split(""));
@@ -96,67 +102,75 @@ export default function Typetest({ onQuery }) {
       ? (inputLength = 0)
       : (inputLength = userInput.length);
 
+    var iActive;
+    var jActive;
+    // locate active indexes
+    if (copyWords[userInput.length - 1].textArray[userInput[userInput.length - 1].length] == undefined) {
+      iActive = userInput.length;
+      jActive = 0;
+    } else {
+      iActive = userInput.length - 1;
+      jActive = userInput[userInput.length - 1].length;
+    }
+  
     // word input checker
-    for (let i = Math.max(0, inputLength - 2); i < Math.min(totalWords, inputLength + 1); i++) {
+    for (let i = Math.max(0, inputLength - 2); i < inputLength + 1; i++) {
+      // get previous word, current word and next word length
       userInput[i] == undefined ? (subInputLength = 0) : (subInputLength = userInput[i].length);
-      words[i].pop();
-      for (let j = 0; j < Math.max(subInputLength, words[i].length); j++) {
-        // correction - next word unwriten
+      // remove space
+      copyWords[i].textArray.pop();
+
+      for (let j = 0; j < Math.max(subInputLength, words[i].textArray.length); j++) {
+        // not typed word
         if (userInput[i] === undefined) {
-          copyWords[i][j].status = "";
-        } else if (
-          userInput[i][j] == undefined &&
-          words[i][j].status == "extra"
-        ) {
-          while (j < words[i].length) {
-            copyWords[i].pop();
+          copyWords[i].textArray[j].status = "";
+
+        // not typed char
+        } else if (userInput[i][j] === undefined && i >= iActive && j >= jActive) {
+          if (words[i].textArray[j].status != "extra") {
+            copyWords[i].textArray[j].status = "";
+          } else {
+            // remove extra char
+            while (j < words[i].textArray.length) {
+              copyWords[i].textArray.pop();
+            }
           }
-        } else if (j > userInput[i].length - 1) {
-          copyWords[i][j].status = "";
 
-          // extra char
-        } else if (words[i][j] == undefined) {
-          copyWords[i][j] = { text: userInput[i][j], status: "extra" };
+        // missed char
+        } else if (userInput[i][j] == undefined && words[i].textArray[j].status != "extra") {
+          copyWords[i].textArray[j].status = "missed"
+
+        // extra char
+        } else if (words[i].textArray[j] == undefined) {
+          copyWords[i].textArray[j] = { text: userInput[i][j], status: "extra" };
           errorChars++;
-
-          // not typed/backspaced char
-        } else if (userInput[i][j] === undefined) {
-          copyWords[i][j].status = "";
-
-          // space
-        } else if (words[i][j] == "\xa0") {
-          copyWords[i][j].status = "";
-
-          // normal - wrong char
-        } else if (
-          userInput[i][j] != words[i][j].text &&
-          copyWords[i][j].status != "extra"
-        ) {
-          if (words[i][j].status != "incorrect") {
+  
+        // correct char
+        } else if (userInput[i][j] == words[i].textArray[j].text && words[i].textArray[j].status != "extra") {
+          if (words[i].textArray[j].status != "correct") {
+            setCorrectChars(x => x + 1);
+          }
+          copyWords[i].textArray[j].status = "correct";
+  
+        // incorrect char
+        } else if (userInput[i][j] != words[i].textArray[j].text && words[i].textArray[j].status != "extra") {
+          if (words[i].textArray[j].status != "incorrect") {
             errorChars++;
           }
-          copyWords[i][j].status = "incorrect";
-
-          // normal - right char
-        } else if (
-          userInput[i][j] == words[i][j].text &&
-          copyWords[i][j].status != "extra"
-        ) {
-          copyWords[i][j].status = "correct";
+          copyWords[i].textArray[j].status = "incorrect";
         }
       }
-      words[i].push({ text: "\xa0" });
+      // retrieve space
+      copyWords[i].textArray.push({ text: "\xa0" });
     }
-
+  
     // locate active word
-    if (copyWords[userInput.length - 1][userInput[userInput.length - 1].length] == undefined) {
-      copyWords[userInput.length][0].status = "active";
+    if (copyWords[userInput.length - 1].textArray[userInput[userInput.length - 1].length] == undefined) {
+      copyWords[userInput.length].textArray[0].status = "active";
     } else {
-      copyWords[userInput.length - 1][
-        userInput[userInput.length - 1].length
-      ].status = "active";
+      copyWords[userInput.length - 1].textArray[userInput[userInput.length - 1].length].status = "active";
     }
-
+  
     setWords([...copyWords]);
   };
 
@@ -196,11 +210,13 @@ export default function Typetest({ onQuery }) {
         <Stats
           started={started}
           typedChars={typedChars}
+          correctChars={correctChars}
           onEnd={setEnd}
           getTime={setTime}
           getWpm={setWpm}
-          getTotalWords={setTotalTime}
-          getTotalTime={setTotalWords}
+          getRaw={setRaw}
+          getTotalWords={setTotalWords}
+          getTotalTime={setTotalTime}
           getMode={setMode}
         />
         <div className="typetestInput">
@@ -216,8 +232,8 @@ export default function Typetest({ onQuery }) {
         <div className="typetestText">
           <div id="caret" style={{ left: caret.left, top: caret.top }}></div>
           {words.map((word, i) => (
-            <div className="words" key={i}>
-              {word.map((letter, j) => (
+            <div className={`words ${word.status}`} key={i}>
+              {word.textArray.map((letter, j) => (
                 <span className={letter.status} key={j}>
                   {letter.text}
                 </span>

@@ -5,21 +5,29 @@ const DEFAULT_TIME = 30;
 const DEFAULT_MODE = "TIME";
 var totalTime = DEFAULT_TIME;
 
-export default function Stats({ onEnd, started, getTotalTime, getTotalWords, getMode, getWpm, typedChars }) {
+export default function Stats({ onEnd, started, getTotalTime, getTotalWords, getMode, getWpm, getRaw, typedChars, correctChars }) {
   const [mode, setMode] = useState(DEFAULT_MODE);
   const [totalWords, setTotalWords] = useState(DEFAULT_WORDS);
   const [time, setTime] = useState(DEFAULT_TIME);
   const [wpm, setWpm] = useState(0);
+  const [raw, setRaw] = useState(0);
 
   function handleWpm() {
     if (time > 0) {
-      setWpm(Math.round(typedChars * 12 / (totalTime - time + 1)))
+      setWpm(Math.round(correctChars * 12 / (totalTime - time + 1)))
+    }
+  }
+
+  function handleRaw() {
+    if (time > 0) {
+      setRaw(Math.round(typedChars * 12 / (totalTime - time + 1)))
     }
   }
   
   // timer end handler
   function handleEnd() {
     getWpm(wpm);
+    getRaw(raw);
     onEnd(true);
   }
 
@@ -29,11 +37,13 @@ export default function Stats({ onEnd, started, getTotalTime, getTotalWords, get
       const interval = setInterval(() => {
         setTime(time - 1);
         handleWpm();
+        handleRaw();
       }, 1000);
       return () => clearInterval(interval);
     } else if (time < 1){
       handleEnd();
     } else if (started == false) {
+      setWpm(0);
       setWpm(0);
     }
   }, [time, started]);
@@ -43,6 +53,7 @@ export default function Stats({ onEnd, started, getTotalTime, getTotalWords, get
       getMode("WORDS");
       setMode("WORDS");
     } else if (e === "mode" && mode === "WORDS") {
+      getTotalWords(200)
       getMode("TIME");
       setMode("TIME");
     } else if (mode === "TIME") {
@@ -65,10 +76,10 @@ export default function Stats({ onEnd, started, getTotalTime, getTotalWords, get
           </span>
         </div>
         <div className="statsConfig">
-          <button onClick={() => handleConfig(5)}>5</button>
+          <button onClick={() => handleConfig(15)}>15</button>
           <button onClick={() => handleConfig(30)}>30</button>
           <button onClick={() => handleConfig(60)}>60</button>
-          <button onClick={() => handleConfig("mode")}>{mode}</button>
+          {/* <button onClick={() => handleConfig("mode")}>{mode}</button> */}
         </div>
       </div>
     </>
