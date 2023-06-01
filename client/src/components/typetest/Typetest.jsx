@@ -6,7 +6,7 @@ var errorChars = 0;
 var oldInputElement = 0;
 
 export default function Typetest({ onQuery }) {
-  const [caret, setCaret] = useState({ left: 0, top: 6, line: 1, init: false });
+  const [caret, setCaret] = useState({ left: 0, top: 6, line: 0, init: false });
   const [words, setWords] = useState([]);
   const [typedChars, setTypedChars] = useState(0);
   const [correctChars, setCorrectChars] = useState(0);
@@ -48,7 +48,7 @@ export default function Typetest({ onQuery }) {
       onQuery({
         wpm: wpm,                                                    // kinda working
         accuracy: (typedChars - errorChars) * 100 / typedChars,      // kinda working, needs to add error from incorrect spacing
-        raw: typedChars,                                             // kinda working
+        raw: raw,                                             // kinda working
         consistency: 0,                                              // not working
         burst: 0,                                                    // not working
         finished: true,                                              // working
@@ -187,15 +187,11 @@ export default function Typetest({ onQuery }) {
       if (parentTop > caret.top) {
         const box = document.querySelector(".typetestText");
         line++;
-        if (line > 2) {
-          box.scrollBy(0, 42);
-        }
+        box.scrollTo(0, 42*line);
       } else if (parentTop < caret.top) {
         const box = document.querySelector(".typetestText");
         line--;
-        if (line > 1) {
-          box.scrollBy(0, -42);
-        }
+        box.scrollTo(0, 42*line);
       }
       var parentTop = elem.offsetTop;
       var parentLeft = elem.offsetLeft;
