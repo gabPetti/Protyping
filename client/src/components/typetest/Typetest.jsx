@@ -187,11 +187,15 @@ export default function Typetest({ onQuery }) {
       if (parentTop > caret.top) {
         const box = document.querySelector(".typetestText");
         line++;
-        box.scrollTo(0, 42*line);
+        if (line > 1) {
+          box.scrollTo(0, 42*(line - 1));
+        }
       } else if (parentTop < caret.top) {
         const box = document.querySelector(".typetestText");
         line--;
-        box.scrollTo(0, 42*line);
+        if (line > 0) {
+          box.scrollTo(0, 42*(line - 1));
+        }
       }
       var parentTop = elem.offsetTop;
       var parentLeft = elem.offsetLeft;
