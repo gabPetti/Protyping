@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import wordList from "./words.json";
+import axios from "axios";
+// import wordList from "./words.json";
 import Stats from "../stats/Stats";
 import "./typetest.sass";
 var errorChars = 0;
@@ -65,6 +66,7 @@ export default function Typetest({ onQuery }) {
     oldInputElement = 0;
 
     var wordsArray = [];
+    const wordList = axios.get("/words/")
     inputElement.current.value = "";
     var wordGenerated;
     for (let i = 0; i < totalWords; i++) {
