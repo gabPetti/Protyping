@@ -48,14 +48,14 @@ export default function Typetest({ getStats }) {
   useEffect(() => {
     if (end === true) {
       getStats({
-        wpm: wpm,                                                    // kinda working
+        wpm: wpm,                                                    // working
         wpmArray: wpmArray,                                          // working
-        accuracy: (typedChars - errorChars) * 100 / typedChars,      // kinda working, needs to add error from incorrect spacing
-        raw: raw,                                                    // kinda working
+        accuracy: (typedChars - errorChars) * 100 / typedChars,      // not working, needs to add error from incorrect spacing
+        raw: raw,                                                    // working
         consistency: 0,                                              // not working
         burst: 0,                                                    // not working
         finished: true,                                              // working
-        totalTime: totalTime                                         // not working
+        totalTime: totalTime                                         // working
       });
     }
   }, [end]);
