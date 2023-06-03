@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
-// import wordList from "./words.json";
+var wordList;
 import Stats from "../stats/Stats";
 import "./typetest.sass";
 var errorChars = 0;
 var oldInputElement = 0;
 
-export default function Typetest({ onQuery }) {
+export default function Typetest({ getStats }) {
   const [caret, setCaret] = useState({ left: 0, top: 6, line: 0, init: false });
   const [words, setWords] = useState([]);
   const [typedChars, setTypedChars] = useState(0);
@@ -18,6 +18,7 @@ export default function Typetest({ onQuery }) {
   const [totalTime, setTotalTime] = useState(30);
   
   const [wpm, setWpm] = useState(0);
+  const [wpmArray, setWpmArray] = useState([])
   const [raw, setRaw] = useState(0);
   const [started, setStarted] = useState(false);
   const [end, setEnd] = useState(false);
@@ -46,13 +47,15 @@ export default function Typetest({ onQuery }) {
   // transition to dashboard
   useEffect(() => {
     if (end === true) {
-      onQuery({
+      getStats({
         wpm: wpm,                                                    // kinda working
+        wpmArray: wpmArray,                                          // working
         accuracy: (typedChars - errorChars) * 100 / typedChars,      // kinda working, needs to add error from incorrect spacing
-        raw: raw,                                             // kinda working
+        raw: raw,                                                    // kinda working
         consistency: 0,                                              // not working
         burst: 0,                                                    // not working
         finished: true,                                              // working
+        totalTime: totalTime                                         // not working
       });
     }
   }, [end]);
@@ -66,24 +69,29 @@ export default function Typetest({ onQuery }) {
     oldInputElement = 0;
 
     var wordsArray = [];
-    const wordList = axios.get("/words/")
     inputElement.current.value = "";
-    var wordGenerated;
-    for (let i = 0; i < totalWords; i++) {
-      wordGenerated = wordList.words[Math.floor(Math.random() * 9904)].split("");
-      for (let j = 0; j < wordGenerated.length; j++) {
-        wordGenerated[j] = {
-          text: wordGenerated[j],
-          status: "",
-        };
+
+    const fetchWords = async () => {
+      const res = await axios.get("/server/words/english/10000");
+      wordList = res.data
+      var wordGenerated;
+      for (let i = 0; i < totalWords; i++) {
+        wordGenerated = wordList[Math.floor(Math.random() * 10000)].split("");
+        for (let j = 0; j < wordGenerated.length; j++) {
+          wordGenerated[j] = {
+            text: wordGenerated[j],
+            status: "",
+          };
+        }
+        wordGenerated.push({ text: "\xa0" });
+        wordsArray = wordsArray.concat({ textArray: wordGenerated, status: "" });
       }
-      wordGenerated.push({ text: "\xa0" });
-      wordsArray = wordsArray.concat({ textArray: wordGenerated, status: "" });
-    }
-    wordsArray[0].textArray[0].status = "active";
-    wordsArray[0].status = "active";
-    setWords([...wordsArray]);
-    setStarted(false)
+      wordsArray[0].textArray[0].status = "active";
+      wordsArray[0].status = "active";
+      setWords([...wordsArray]);
+      setStarted(false)
+    };
+    fetchWords();
   }, [mode, totalWords, totalTime]);
 
   // Compare input text with the words of the test
@@ -115,13 +123,13 @@ export default function Typetest({ onQuery }) {
       jActive = userInput[userInput.length - 1].length;
     }
   
-    // word input checker
+    // iterate through 3 words: previous word, current word and next word
     for (let i = Math.max(0, inputLength - 2); i < inputLength + 1; i++) {
       // get previous word, current word and next word length
       userInput[i] == undefined ? (subInputLength = 0) : (subInputLength = userInput[i].length);
       // remove space
       copyWords[i].textArray.pop();
-
+      var wordIsCorrect = true
       for (let j = 0; j < Math.max(subInputLength, words[i].textArray.length); j++) {
         // not typed word
         if (userInput[i] === undefined) {
@@ -141,11 +149,13 @@ export default function Typetest({ onQuery }) {
         // missed char
         } else if (userInput[i][j] == undefined && words[i].textArray[j].status != "extra") {
           copyWords[i].textArray[j].status = "missed"
+          wordIsCorrect = false;
 
         // extra char
         } else if (words[i].textArray[j] == undefined) {
           copyWords[i].textArray[j] = { text: userInput[i][j], status: "extra" };
           errorChars++;
+          wordIsCorrect = false;
   
         // correct char
         } else if (userInput[i][j] == words[i].textArray[j].text && words[i].textArray[j].status != "extra") {
@@ -160,7 +170,19 @@ export default function Typetest({ onQuery }) {
             errorChars++;
           }
           copyWords[i].textArray[j].status = "incorrect";
+          wordIsCorrect = false;
         }
+      }
+      if (words[i].status == "active") {
+        copyWords[i].status = "";
+      }
+      // check if previous word is correct
+      if (i == Math.max(0, inputLength - 2) && wordIsCorrect == false && words[i].status != "incorrect") {
+        copyWords[i].status == "incorrect";
+        errorChars++;
+        console.log("error for spacing at the wrong time")
+      } else if (i == Math.max(0, inputLength - 2) && wordIsCorrect == true && words[i].status != "incorrect") {
+        copyWords[i].status == "correct";
       }
       // retrieve space
       copyWords[i].textArray.push({ text: "\xa0" });
@@ -169,8 +191,10 @@ export default function Typetest({ onQuery }) {
     // locate active word
     if (copyWords[userInput.length - 1].textArray[userInput[userInput.length - 1].length] == undefined) {
       copyWords[userInput.length].textArray[0].status = "active";
+      copyWords[userInput.length].status = "active";
     } else {
       copyWords[userInput.length - 1].textArray[userInput[userInput.length - 1].length].status = "active";
+      copyWords[userInput.length - 1].status = "active";
     }
   
     setWords([...copyWords]);
@@ -216,6 +240,7 @@ export default function Typetest({ onQuery }) {
           onEnd={setEnd}
           getTime={setTime}
           getWpm={setWpm}
+          getWpmArray={setWpmArray}
           getRaw={setRaw}
           getTotalWords={setTotalWords}
           getTotalTime={setTotalTime}

@@ -28,13 +28,15 @@ export default function TestArea() {
         {stats.finished ? (
           <Dashboard
             wpm={stats.wpm}
+            wpmArray={stats.wpmArray}
             accuracy={stats.accuracy}
             raw={stats.raw}
             consistency={stats.consistency}
             burst={stats.burst}
+            totalTime={stats.totalTime}
           />
         ) : (
-          <Typetest onQuery={setStats} />
+          <Typetest getStats={setStats} />
         )}
       </CSSTransition>
     </SwitchTransition>

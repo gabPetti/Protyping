@@ -5,16 +5,18 @@ const DEFAULT_TIME = 30;
 const DEFAULT_MODE = "TIME";
 var totalTime = DEFAULT_TIME;
 
-export default function Stats({ onEnd, started, getTotalTime, getTotalWords, getMode, getWpm, getRaw, typedChars, correctChars }) {
+export default function Stats({ onEnd, started, getTotalTime, getTotalWords, getMode, getWpm, getWpmArray, getRaw, typedChars, correctChars }) {
   const [mode, setMode] = useState(DEFAULT_MODE);
   const [totalWords, setTotalWords] = useState(DEFAULT_WORDS);
   const [time, setTime] = useState(DEFAULT_TIME);
   const [wpm, setWpm] = useState(0);
+  const [wpmArray, setWpmArray] = useState([]);
   const [raw, setRaw] = useState(0);
 
   function handleWpm() {
     if (time > 0) {
       setWpm(Math.round(correctChars * 12 / (totalTime - time + 1)))
+      setWpmArray([...wpmArray, Math.round(correctChars * 12 / (totalTime - time + 1))])
     }
   }
 
@@ -27,6 +29,7 @@ export default function Stats({ onEnd, started, getTotalTime, getTotalWords, get
   // timer end handler
   function handleEnd() {
     getWpm(wpm);
+    getWpmArray(wpmArray)
     getRaw(raw);
     onEnd(true);
   }
