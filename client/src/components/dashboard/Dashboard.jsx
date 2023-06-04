@@ -35,8 +35,8 @@ const optionsRadar = {
   },
   elements: {
     point: {
-      pointRadius: 3,
-      pointBackgroundColor: "rgba(255, 99, 132, 1)",
+      pointRadius: 4,
+      pointBackgroundColor: "rgba(75,192,192,1)",
       pointBorderColor: "#181A1B",
       pointBorderWidth: 2,
     }
@@ -98,9 +98,9 @@ export default function Dashboard({ wpm, wpmArray, accuracy, raw, consistency, b
       {
         label: false,
         data: [wpm, accuracy, raw, 61, 2],
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        borderColor: 'rgba(255, 99, 132, 1)',
-        borderWidth: 2,
+        backgroundColor: "rgba(75,192,192,0.2)",
+        borderColor: "rgba(75,192,192,1)",
+        borderWidth: 2.5,
         color: "white",
       },
     ],
