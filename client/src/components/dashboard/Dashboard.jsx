@@ -12,6 +12,8 @@ import {
 } from 'chart.js';
 import { Radar } from 'react-chartjs-2';
 import { Line } from 'react-chartjs-2';
+import { useContext } from 'react';
+import { TypetestContext } from "../../context/TypetestContext";
 import "./dashboard.sass"
 
 ChartJS.register(
@@ -90,8 +92,12 @@ const optionsLine = {
   }
 }
 
-export default function Dashboard({ wpm, wpmArray, accuracy, raw, consistency, burst, totalTime }) {
-
+export default function Dashboard({ wpm, accuracy, raw, consistency, burst }) {
+  const {
+    totalTime,
+    wpmArray
+  } = useContext(TypetestContext);
+  console.log(wpmArray)
   const dataRadar = {
     labels: ['WPM', 'Accuracy', 'Raw', 'Consistency', 'Burst'],
     datasets: [
