@@ -1,71 +1,80 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { TypetestContext } from "../../context/TypetestContext";
 import "./stats.sass";
-const DEFAULT_WORDS = 30;
-const DEFAULT_TIME = 30;
-const DEFAULT_MODE = "TIME";
-var totalTime = DEFAULT_TIME;
 
-export default function Stats({ onEnd, started, getTotalTime, getTotalWords, getMode, getWpm, getWpmArray, getRaw, typedChars, correctChars }) {
-  const [mode, setMode] = useState(DEFAULT_MODE);
-  const [totalWords, setTotalWords] = useState(DEFAULT_WORDS);
-  const [time, setTime] = useState(DEFAULT_TIME);
-  const [wpm, setWpm] = useState(0);
-  const [wpmArray, setWpmArray] = useState([]);
-  const [raw, setRaw] = useState(0);
+export default function Stats({ onEnd, started }) {
+  const [timer, setTimer] = useState(0);
+  const {
+    wpm,
+    wpmArray,
+    mode,
+    totalTime,
+    totalWords,
+    time,
+    typedChars,
+    correctChars,
+    updateMode,
+    updateTotalTime,
+    updateTime,
+    updateWpm,
+    updateWpmArray,
+    updateRaw
+  } = useContext(TypetestContext);
 
   function handleWpm() {
     if (time > 0) {
-      setWpm(Math.round(correctChars * 12 / (totalTime - time + 1)))
-      setWpmArray([...wpmArray, Math.round(correctChars * 12 / (totalTime - time + 1))])
+      updateWpm(Math.round((correctChars * 12) / (totalTime - time + 1)));
+      updateWpmArray([
+        ...wpmArray,
+        Math.round((correctChars * 12) / (totalTime - time + 1)),
+      ]);
     }
   }
 
   function handleRaw() {
     if (time > 0) {
-      setRaw(Math.round(typedChars * 12 / (totalTime - time + 1)))
+      updateRaw(Math.round((typedChars * 12) / (totalTime - time + 1)));
     }
   }
-  
+
   // timer end handler
   function handleEnd() {
-    getWpm(wpm);
-    getWpmArray(wpmArray)
-    getRaw(raw);
     onEnd(true);
   }
+
+  // updates when timer changes
+  useEffect(() => {
+    if (timer > 0) {
+      updateTime(time - 1);
+      handleWpm();
+      handleRaw();
+    }
+  }, [timer]);
 
   // timer that counts down until 0
   useEffect(() => {
     if (started == true && time > 0) {
       const interval = setInterval(() => {
-        setTime(time - 1);
-        handleWpm();
-        handleRaw();
+        setTimer((x) => x + 1);
       }, 1000);
       return () => clearInterval(interval);
-    } else if (time < 1){
+    } else if (time < 1) {
       handleEnd();
     } else if (started == false) {
-      setWpm(0);
-      setWpm(0);
+      updateWpm(0);
     }
   }, [time, started]);
 
-  const handleConfig = e => {
+  const handleConfig = (e) => {
     if (e === "mode" && mode === "TIME") {
-      getMode("WORDS");
-      setMode("WORDS");
+      updateMode("WORDS");
     } else if (e === "mode" && mode === "WORDS") {
-      getTotalWords(200)
-      getMode("TIME");
-      setMode("TIME");
+      updateMode("TIME");
     } else if (mode === "TIME") {
-      totalTime = e
-      getTotalTime(e)
-      setTime(e);
+      updateTotalTime(e);
+      updateTime(e);
     } else if (mode === "WORDS") {
       // totalWords = e
-      getTotalWords(e);
       setTotalWords(e);
     }
   };

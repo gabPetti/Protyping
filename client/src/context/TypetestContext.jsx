@@ -72,6 +72,8 @@ export const TypetestContextProvider = ({ children }) => {
     mode,
     totalTime,
     totalWords,
+    typedChars,
+    correctChars,
     time,
     wpm,
     wpmArray,
