@@ -20,7 +20,20 @@ export const TypetestContextProvider = ({ children }) => {
   const [wpmArray, setWpmArray] = useState([]);
   const [raw, setRaw] = useState(0);
 
+  const [started, setStarted] = useState(false);
+  const [end, setEnd] = useState(false);
+
   // Define any functions or state updates needed
+
+  // Update Started
+  const updateStarted = (newStarted) => {
+    setStarted(newStarted);
+  };
+
+  // Update End
+  const updateEnd = (newEnd) => {
+    setEnd(newEnd);
+  };
 
   // Update typedChars
   const updateTypedChars = (newTypedChars) => {
@@ -69,6 +82,8 @@ export const TypetestContextProvider = ({ children }) => {
 
   // Create the context value object
   const contextValue = {
+    started,
+    end,
     mode,
     totalTime,
     totalWords,
@@ -78,6 +93,8 @@ export const TypetestContextProvider = ({ children }) => {
     wpm,
     wpmArray,
     raw,
+    updateStarted,
+    updateEnd,
     updateMode,
     updateTotalTime,
     updateTotalWords,
