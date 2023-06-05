@@ -11,6 +11,7 @@ export default function Typetest({ getStats }) {
   const [caret, setCaret] = useState({ left: 0, top: 6, line: 0, init: false });
   const [words, setWords] = useState([]);
   const {
+    end,
     wpm,
     wpmArray,
     raw,
@@ -20,9 +21,8 @@ export default function Typetest({ getStats }) {
     typedChars,
     updateTypedChars,
     updateCorrectChars,
+    updateStarted
   } = useContext(TypetestContext);
-  const [started, setStarted] = useState(false);
-  const [end, setEnd] = useState(false);
   const inputElement = useRef();
 
   // automatic focus on test when not fosusing on another input
@@ -49,18 +49,17 @@ export default function Typetest({ getStats }) {
     }
   }
 
-  // transition to dashboard
+  // transition to dashboard and calculate stats
   useEffect(() => {
     if (end === true) {
       getStats({
-        wpm: wpm, // working
-        wpmArray: wpmArray, // working
+        wpm: wpm,
+        wpmArray: wpmArray,
         accuracy: ((typedChars - errorChars) * 100) / typedChars, // not working, needs to add error from incorrect spacing
-        raw: raw, // working
+        raw: raw,
         consistency: 0, // not working
         burst: 0, // not working
-        finished: true, // working
-        totalTime: totalTime, // working
+        finished: true,
       });
     }
   }, [end]);
@@ -97,14 +96,15 @@ export default function Typetest({ getStats }) {
       wordsArray[0].textArray[0].status = "active";
       wordsArray[0].status = "active";
       setWords([...wordsArray]);
-      setStarted(false);
+      updateStarted(false);
     };
     fetchWords();
   }, [mode, totalWords, totalTime]);
 
   // Compare input text with the words of the test
+  // remake idea: identify only typed char
   const handleInput = () => {
-    setStarted(true);
+    updateStarted(true);
     if (oldInputElement < inputElement.current.value.length) {
       updateTypedChars((x) => x + 1);
     }
@@ -134,26 +134,20 @@ export default function Typetest({ getStats }) {
       iActive = userInput.length - 1;
       jActive = userInput[userInput.length - 1].length;
     }
-
+    var firstWord = true;
     // iterate through 3 words: previous word, current word and next word
     for (let i = Math.max(0, inputLength - 2); i < inputLength + 1; i++) {
       // get previous word, current word and next word length
-      userInput[i] == undefined
-        ? (subInputLength = 0)
-        : (subInputLength = userInput[i].length);
+      userInput[i] == undefined ? (subInputLength = 0) : (subInputLength = userInput[i].length);
       // remove space
       copyWords[i].textArray.pop();
       var wordIsCorrect = true;
-      for (
-        let j = 0;
-        j < Math.max(subInputLength, words[i].textArray.length);
-        j++
-      ) {
+      for (let j = 0; j < Math.max(subInputLength, words[i].textArray.length); j++) {
         // not typed word
         if (userInput[i] === undefined) {
           copyWords[i].textArray[j].status = "";
 
-          // not typed char
+        // not typed char
         } else if (
           userInput[i][j] === undefined &&
           i >= iActive &&
@@ -168,7 +162,7 @@ export default function Typetest({ getStats }) {
             }
           }
 
-          // missed char
+        // missed char
         } else if (
           userInput[i][j] == undefined &&
           words[i].textArray[j].status != "extra"
@@ -176,7 +170,7 @@ export default function Typetest({ getStats }) {
           copyWords[i].textArray[j].status = "missed";
           wordIsCorrect = false;
 
-          // extra char
+        // extra char
         } else if (words[i].textArray[j] == undefined) {
           copyWords[i].textArray[j] = {
             text: userInput[i][j],
@@ -185,7 +179,7 @@ export default function Typetest({ getStats }) {
           errorChars++;
           wordIsCorrect = false;
 
-          // correct char
+        // correct char
         } else if (
           userInput[i][j] == words[i].textArray[j].text &&
           words[i].textArray[j].status != "extra"
@@ -195,7 +189,7 @@ export default function Typetest({ getStats }) {
           }
           copyWords[i].textArray[j].status = "correct";
 
-          // incorrect char
+        // incorrect char
         } else if (
           userInput[i][j] != words[i].textArray[j].text &&
           words[i].textArray[j].status != "extra"
@@ -212,7 +206,7 @@ export default function Typetest({ getStats }) {
       }
       // check if previous word is correct
       if (
-        i == Math.max(0, inputLength - 2) &&
+        firstWord == true &&
         wordIsCorrect == false &&
         words[i].status != "incorrect"
       ) {
@@ -228,20 +222,16 @@ export default function Typetest({ getStats }) {
       }
       // retrieve space
       copyWords[i].textArray.push({ text: "\xa0" });
+
+      firstWord == false
     }
 
     // locate active word
-    if (
-      copyWords[userInput.length - 1].textArray[
-        userInput[userInput.length - 1].length
-      ] == undefined
-    ) {
+    if (copyWords[userInput.length - 1].textArray[userInput[userInput.length - 1].length] == undefined) {
       copyWords[userInput.length].textArray[0].status = "active";
       copyWords[userInput.length].status = "active";
     } else {
-      copyWords[userInput.length - 1].textArray[
-        userInput[userInput.length - 1].length
-      ].status = "active";
+      copyWords[userInput.length - 1].textArray[userInput[userInput.length - 1].length].status = "active";
       copyWords[userInput.length - 1].status = "active";
     }
 
@@ -281,7 +271,7 @@ export default function Typetest({ getStats }) {
   return (
     <div className="typetestContainer">
       <div className="typetestWrapper">
-        <Stats started={started} onEnd={setEnd} />
+        <Stats />
         <div className="typetestInput">
           <input
             id="inputElement"

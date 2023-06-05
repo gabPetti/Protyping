@@ -9,6 +9,7 @@ import { TypetestContextProvider } from '../../context/TypetestContext';
 export default function TestArea() {
   const [stats, setStats] = useState({
     wpm: 0,
+    wpmArray: [],
     accuracy: 0,
     raw: 0,
     consistency: 0,
@@ -36,7 +37,6 @@ export default function TestArea() {
               raw={stats.raw}
               consistency={stats.consistency}
               burst={stats.burst}
-              totalTime={stats.totalTime}
             />
           ) : (
             <Typetest getStats={setStats} />

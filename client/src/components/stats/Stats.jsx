@@ -2,9 +2,10 @@ import { useState, useEffect, useContext } from "react";
 import { TypetestContext } from "../../context/TypetestContext";
 import "./stats.sass";
 
-export default function Stats({ onEnd, started }) {
+export default function Stats() {
   const [timer, setTimer] = useState(0);
   const {
+    started,
     wpm,
     wpmArray,
     mode,
@@ -17,6 +18,7 @@ export default function Stats({ onEnd, started }) {
     updateTotalTime,
     updateTime,
     updateWpm,
+    updateEnd,
     updateWpmArray,
     updateRaw
   } = useContext(TypetestContext);
@@ -24,10 +26,7 @@ export default function Stats({ onEnd, started }) {
   function handleWpm() {
     if (time > 0) {
       updateWpm(Math.round((correctChars * 12) / (totalTime - time + 1)));
-      updateWpmArray([
-        ...wpmArray,
-        Math.round((correctChars * 12) / (totalTime - time + 1)),
-      ]);
+      updateWpmArray([...wpmArray, Math.round((correctChars * 12) / (totalTime - time + 1))]);
     }
   }
 
@@ -39,7 +38,7 @@ export default function Stats({ onEnd, started }) {
 
   // timer end handler
   function handleEnd() {
-    onEnd(true);
+    updateEnd(true);
   }
 
   // updates when timer changes

@@ -1,6 +1,6 @@
 import React, { createContext, useState } from 'react';
 const DEFAULT_MODE = "TIME"
-const DEFAULT_TIME = 30
+const DEFAULT_TIME = 3
 const DEFAULT_WORDS = 30
 
 // Create the context object
