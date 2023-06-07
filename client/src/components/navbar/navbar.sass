@@ -1,14 +1,42 @@
+:root
+  --ti-cursor-font-weight: 200
+  --ti-cursor-line-height: 50px
+  --ti-cursor-font-size: 50px
+  --ti-cursor-transform: translateX(-.26em)
+
 .navbarContainer
   .navbarTop
-    height: 100px
-    color: white
     display: flex
     align-items: center
     justify-content: center
+    width: 100vw
+    height: 80px
+    color: white
+    position: relative
+
+    .config
+      position: absolute
+      left: 40px
+      justify-self: flex-start
 
     .logo
       font-size: 40px
       font-weight: 400
+
+    .profile
+      justify-self: flex-end
+
+      .profileButton
+        height: 40px
+        position: absolute
+        right: 40px
+        top: 20px
+        font-size: 16px
+        padding: 0 10px
+        border: 2px solid white
+        border-radius: 12px
+        background: none
+        cursor: pointer
 
   .navbarBottom
     height: 50px
