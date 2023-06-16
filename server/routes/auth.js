@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const User = require("../userModel");
 const bcrypt = require("bcrypt");
+const dotenv = require("dotenv").config();
+const jwt = require("jsonwebtoken");
 
 // register
 router.post("/register", async (req, res) => {
@@ -44,7 +46,15 @@ router.get("/login", async (req, res) => {
         .status(400)
         .json("Couldn't find any user with this email and password");
 
-    res.status(200).json({ msg: `Welcome back, ${user.username}` });
+    const token = jwt.sign(user, process.env.JWT_SECRET_KEY)
+
+    res.status(200).json({
+      status: "success",
+      token,
+      data: {
+        user
+      }
+    });
   } catch (err) {
     res.status(500).json(err);
   }
